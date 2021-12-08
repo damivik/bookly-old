@@ -2,6 +2,8 @@ package com.github.damivik.bookly.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -11,6 +13,7 @@ import org.mockito.quality.Strictness;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.github.damivik.bookly.dto.UserRegistration;
+import com.github.damivik.bookly.dto.UserUpdate;
 import com.github.damivik.bookly.entity.User;
 import com.github.damivik.bookly.repository.UserRepository;
 
@@ -44,4 +47,35 @@ class UserServiceTest {
 		assertEquals(encodedPassword, captor.getValue().getPassword());
 	}
 
+	@Test
+	void update() {
+		String email = "johndoe@example.com";
+		String password = "password"; 
+		String encodedPassword = "encoded_password";
+		UserUpdate dto = new UserUpdate();
+		dto.setEmail(email);
+		dto.setPassword(password);
+		User expectedUser = new User();
+		int userId = 1;
+		Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+		UserService userService = new UserService(userRepository);
+		Mockito.when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
+		userService.setPasswordEncoder(passwordEncoder);
+		
+		userService.update(dto, userId);
+		
+		Mockito.verify(userRepository).save(expectedUser);
+		assertEquals(email, expectedUser.getEmail());
+		assertEquals(encodedPassword,expectedUser.getPassword());
+	}
+	
+	@Test
+	void delete() {
+		int userId = 1;
+		UserService userService = new UserService(userRepository);
+		
+		userService.delete(userId);
+		
+		Mockito.verify(userRepository).deleteById(userId);
+	}
 }
