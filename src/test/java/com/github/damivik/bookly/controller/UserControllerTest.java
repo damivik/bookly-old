@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.github.damivik.bookly.dto.UserRegistration;
+import com.github.damivik.bookly.dto.UserUpdate;
 import com.github.damivik.bookly.entity.User;
 import com.github.damivik.bookly.service.UserService;
 
@@ -21,7 +22,7 @@ class UserControllerTest {
 	private UserService userService;
 
 	@Test
-	void createAccount() {
+	void create() {
 		String email = "johnDoe@example.com";
 		String password = "12345678";
 		User expectedUser = new User();
@@ -37,6 +38,27 @@ class UserControllerTest {
 		Mockito.verify(userService).register(dto);
 		assertEquals(expectedLocation, entity.getHeaders().getLocation().getPath()); 
 		assertEquals(HttpStatus.CREATED, entity.getStatusCode());
+	}
+
+	@Test
+	void update() {
+		UserUpdate dto = new UserUpdate();
+		int userId = 1;
+		UserController controller = new UserController(userService);
+		
+		controller.update(dto, userId);
+
+		Mockito.verify(userService).update(dto, userId);
+	}
+
+	@Test
+	void delete() {
+		int userId = 1;
+		UserController controller = new UserController(userService);
+		
+		controller.delete(userId);
+
+		Mockito.verify(userService).delete(userId);
 	}
 
 }
