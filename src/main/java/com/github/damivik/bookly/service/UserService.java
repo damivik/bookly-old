@@ -36,7 +36,7 @@ public class UserService {
 			user.setEmail(dto.getEmail());
 		}
 		if (dto.getPassword() != null) {
-			user.setPassword(dto.getPassword());
+			user.setPassword(passwordEncoder.encode(dto.getPassword()));
 		}
 		
 		userRepository.save(user);
