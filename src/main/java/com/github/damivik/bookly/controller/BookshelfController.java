@@ -10,6 +10,7 @@ import javax.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,8 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.github.damivik.bookly.dto.BookView;
 import com.github.damivik.bookly.dto.BookshelfView;
 import com.github.damivik.bookly.dto.BookshelvesView;
-import com.github.damivik.bookly.dto.NewBookshelf;
 import com.github.damivik.bookly.entity.Bookshelf;
+import com.github.damivik.bookly.entity.User;
 import com.github.damivik.bookly.service.BookshelfService;
 import com.github.damivik.bookly.validation.UserExists;
 
@@ -36,13 +37,14 @@ public class BookshelfController {
 	}
 
 	@PostMapping("/api/bookshelves")
-	public ResponseEntity<String> create(@Valid NewBookshelf dto) {
-		Bookshelf bookshelf = bookshelfService.create(dto);
+	public ResponseEntity<String> create(Authentication authentication, @RequestParam String name) {
+		Bookshelf bookshelf = bookshelfService.create((User)authentication.getPrincipal(), name);
 		URI location = URI.create("/bookshelves/" + bookshelf.getId());
 
 		return ResponseEntity.created(location).build();
 	}
 
+	
 	@GetMapping(path = "/api/bookshelves/{bookshelfId}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public BookshelfView show(@PathVariable int bookshelfId) {
 		Bookshelf shelf = bookshelfService.retrieveBookshelf(bookshelfId);

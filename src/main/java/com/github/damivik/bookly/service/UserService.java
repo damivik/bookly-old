@@ -1,6 +1,7 @@
 package com.github.damivik.bookly.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,7 @@ public class UserService {
 		return userRepository.save(user);
 	}
 	
+	@PreAuthorize("hasPermission(#userId, 'User', 'update')")
 	public void update(UserUpdate dto, int userId) {
 		User user = userRepository.findById(userId).get();
 		
@@ -42,6 +44,7 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
+	@PreAuthorize("hasPermission(#userId, 'User', 'delete')")
 	public void delete (int userId) {
 		userRepository.deleteById(userId);
 	}

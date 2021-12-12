@@ -32,6 +32,10 @@ public class Database {
 	public User createUser() {
 		return userRepository.save(new User("dami@example.com", passwordEncoder.encode("password")));
 	}
+	
+	public User createUser(String email) {
+		return userRepository.save(new User(email, passwordEncoder.encode("password")));
+	}
 
 	public Book createBook(String title, String authors) {
 		return bookRepository.save(new Book(title, authors));

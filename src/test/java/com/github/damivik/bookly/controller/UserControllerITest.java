@@ -33,7 +33,7 @@ public class UserControllerITest {
 	}
 	
 	@Test
-	void newUserCanBeCreated() throws Exception {
+	void create_whenRequestParametersAreValid_returnCreatedStatus() throws Exception {
 		String email = "dami@example.com";
 		String password = "password";
 		
@@ -48,7 +48,7 @@ public class UserControllerITest {
 	}
 	
 	@Test
-	void userCanBeUpdated() throws Exception {
+	void update_returnNoContentStatus() throws Exception {
 		User user = database.createUser();
 		String newEmail = "damivik@example.com";
 		String newPassword = "new_password";
@@ -65,7 +65,25 @@ public class UserControllerITest {
 	}
 	
 	@Test
-	void userCanBeDeleted() throws Exception {
+	void update_whenAuthenticatedUserNotOwnerOfAccount_returnsForbiddenStatus() throws Exception {
+		User accountOwner = database.createUser();
+		User notAccountOwner = database.createUser("not_account_owner@example.com");
+		String newEmail = "new_email@example.com";
+		String newPassword = "new_password";
+		
+		mvc
+			.perform(
+					patch("/api/users/" + accountOwner.getId())
+					.param("email", newEmail)
+					.param("password", newPassword)
+					.with(httpBasic(notAccountOwner.getEmail(), "password")))
+			.andExpect(
+					status()
+					.isForbidden());
+	}
+	
+	@Test
+	void delete_returnNoContentStatus() throws Exception {
 		User user = database.createUser();
 		
 		mvc
@@ -75,5 +93,19 @@ public class UserControllerITest {
 			.andExpect(
 					status()
 					.isNoContent());
+	}
+	
+	@Test
+	void delete_whenAuthenticatedUserNotOwnerOfAccount_returnsForbiddenStatus() throws Exception {
+		User accountOwner = database.createUser();
+		User notAccountOwner = database.createUser("not_account_owner@example.com");
+		
+		mvc
+			.perform(
+					delete("/api/users/" + accountOwner.getId())
+					.with(httpBasic(notAccountOwner.getEmail(), "password")))
+			.andExpect(
+					status()
+					.isForbidden());
 	}
 }

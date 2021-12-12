@@ -48,7 +48,6 @@ class BookshelfControllerITest {
 		mvc
 			.perform(
 					post("/api/bookshelves")
-					.param("userId", Integer.toString(user.getId()))
 					.param("name", bookshelfName).with(httpBasic(user.getUsername(), "password")))
 			.andExpect(status().isCreated())
 			.andExpect(header().exists("Location"));
@@ -79,6 +78,20 @@ class BookshelfControllerITest {
 					.with(httpBasic(user.getUsername(), "password")))
 			.andExpect(status().isNoContent());
 	}
+	
+	@Test
+	void delete_whenAuthenticatedUserNotOwnerOfBookshelf_returnsForbiddenStatus() throws Exception {
+		User shelfOwner = database.createUser();
+		User notShelfOwner = database.createUser("not_shelf_owner@example.com");
+		Bookshelf bookshelf = database.createBookshelf(shelfOwner);
+
+		mvc
+			.perform(MockMvcRequestBuilders
+					.delete("/api/bookshelves/" + bookshelf.getId())
+					.with(httpBasic(notShelfOwner.getUsername(), "password")))
+			.andExpect(status().isForbidden());
+	}
+
 
 	@Test
 	void index() throws Exception {
@@ -114,9 +127,23 @@ class BookshelfControllerITest {
 			.andExpect(jsonPath("$.id", is(bookshelf.getId())))
 			.andExpect(jsonPath("$.name", is(newName)))
 			.andExpect(jsonPath("$.booksCount", is(bookshelf.getBooks().size())));
-		;
 	}
+	
+	@Test
+	void update_whenAuthenticatedUserNotOwnerOfBookshelf_returnForbiddenStatus() throws Exception {
+		User shelfOwner = database.createUser();
+		User notShelfOwner = database.createUser("not_shelf_owner@example.com");
+		Bookshelf bookshelf = database.createBookshelf(shelfOwner);
+		String newName = "Non-Fiction";
 
+		mvc
+			.perform(
+					patch("/api/bookshelves/" + bookshelf.getId())
+					.param("name", newName)
+					.with(httpBasic(notShelfOwner.getUsername(), "password")))
+			.andExpect(status().isForbidden());
+	}
+	
 	@Test
 	void addBook() throws Exception {
 		User user = database.createUser();
@@ -130,15 +157,47 @@ class BookshelfControllerITest {
 					.with(httpBasic(user.getUsername(), "password")))
 			.andExpect(status().isCreated());
 	}
+	
+	@Test
+	void addBook_whenAuthenticatedUserNotOwnerOfBookshelf_returnForbiddenStatus() throws Exception {
+		User shelfOwner = database.createUser();
+		User notShelfOwner = database.createUser("not_shelf_owner@example.com");
+		Bookshelf bookshelf = database.createBookshelf(shelfOwner);
+		Book book = database.createBook();
+
+		mvc
+			.perform(
+					post("/api/bookshelves/" + bookshelf.getId() + "/books")
+					.param("bookId", book.getId().toString())
+					.with(httpBasic(notShelfOwner.getUsername(), "password")))
+			.andExpect(status().isForbidden());
+
+	}
 
 	@Test
 	void removeBook() throws Exception {
 		User user = database.createUser();
 		Bookshelf bookshelf = database.createBookshelf(user);
 
+		mvc
+			.perform(
+					MockMvcRequestBuilders
+					.delete("/api/bookshelves/" + bookshelf.getId() + "/books/" + bookshelf.getBooks().get(0).getId())
+					.with(httpBasic(user.getUsername(), "password")))
+			.andExpect(status().isNoContent());
+	}
+	
+	@Test
+	void removeBook_whenAuthenticatedUserNotOwnerOfBookshelf_returnForbiddenStatus() throws Exception {
+		User shelfOwner = database.createUser();
+		User notShelfOwner = database.createUser("not_shelf_owner@example.com");
+		Bookshelf bookshelf = database.createBookshelf(shelfOwner);
+
 		mvc.perform(
 				MockMvcRequestBuilders
-					.delete("/api/bookshelves/" + bookshelf.getId() + "/books/" + bookshelf.getBooks().get(0).getId())
-				.with(httpBasic(user.getUsername(), "password"))).andExpect(status().isNoContent());
+				.delete("/api/bookshelves/" + bookshelf.getId() + "/books/" + bookshelf.getBooks().get(0).getId())
+				.with(httpBasic(notShelfOwner.getUsername(), "password")))
+		.andExpect(status().isForbidden());
+
 	}
 }
