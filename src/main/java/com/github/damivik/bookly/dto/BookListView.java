@@ -4,11 +4,11 @@ import java.util.List;
 
 import com.github.damivik.bookly.entity.Book;
 
-public class BookView {
+public class BookListView {
 	private int count;
 	private List<Book> books;
 
-	public BookView(List<Book> books) {
+	public BookListView(List<Book> books) {
 		this.count = books.size();
 		this.books = books;
 	}

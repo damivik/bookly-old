@@ -20,7 +20,7 @@ import com.github.damivik.bookly.entity.User;
 @Tag("it")
 @SpringBootTest
 @AutoConfigureMockMvc
-public class UserControllerITest {
+public class UserControllerItTest {
 	@Autowired
 	private MockMvc mvc;
 	
@@ -62,6 +62,24 @@ public class UserControllerITest {
 			.andExpect(
 					status()
 					.isNoContent());
+	}
+	
+	@Test
+	void update_whenUserWithSuppliedUserIdDoesNotExist_returnNotFoundStatus() throws Exception {
+		int nonExistingUserId = 0;
+		User user = database.createUser();
+		String newEmail = "damivik@example.com";
+		String newPassword = "new_password";
+		
+		mvc
+			.perform(
+					patch("/api/users/" + nonExistingUserId)
+					.param("email", newEmail)
+					.param("password", newPassword)
+					.with(httpBasic(user.getEmail(), "password")))
+			.andExpect(
+					status()
+					.isNotFound());
 	}
 	
 	@Test
@@ -107,5 +125,19 @@ public class UserControllerITest {
 			.andExpect(
 					status()
 					.isForbidden());
+	}
+	
+	@Test
+	void delete_whenUserWithSuppliedUserIdDoesNotExist_returnNotFoundStatus() throws Exception {
+		int nonExistingUserId = 0;
+		User user = database.createUser();
+		
+		mvc
+			.perform(
+					delete("/api/users/" + nonExistingUserId)
+					.with(httpBasic(user.getEmail(), "password")))
+			.andExpect(
+					status()
+					.isNotFound());
 	}
 }

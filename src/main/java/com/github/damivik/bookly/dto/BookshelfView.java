@@ -1,32 +1,28 @@
 package com.github.damivik.bookly.dto;
 
+import com.github.damivik.bookly.entity.Bookshelf;
+
 public class BookshelfView {
 	private int id;
-	private int userId;
 	private String name;
-	private int booksCount;
+	private int bookCount;
 
 
-	public BookshelfView(int id, int userId, String name, int booksCount) {
-		this.id = id;
-		this.userId = userId;
-		this.name = name;
-		this.booksCount = booksCount;
+	public BookshelfView(Bookshelf bookshelf) {
+		this.id = bookshelf.getId();
+		this.name = bookshelf.getName();
+		this.bookCount = bookshelf.getBooks().size();
 	}
 
 	public int getId() {
 		return id;
-	}
-
-	public int getUserId() {
-		return userId;
 	}
 	
 	public String getName() {
 		return name;
 	}
 
-	public int getBooksCount() {
-		return booksCount;
+	public int getBookCount() {
+		return bookCount;
 	}
 }

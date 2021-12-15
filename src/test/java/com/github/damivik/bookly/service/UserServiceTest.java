@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.github.damivik.bookly.dto.UserRegistration;
 import com.github.damivik.bookly.dto.UserUpdate;
 import com.github.damivik.bookly.entity.User;
+import com.github.damivik.bookly.exception.UserNotFoundException;
 import com.github.damivik.bookly.repository.UserRepository;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
@@ -46,36 +47,54 @@ class UserServiceTest {
 		assertEquals(email, captor.getValue().getEmail());
 		assertEquals(encodedPassword, captor.getValue().getPassword());
 	}
-
+	
 	@Test
-	void update() {
+	void retrieve_throwUserNotFoundException_whenUserWithSuppliedIdDoesNotExist() {
+		int userId = 1;
+		UserService service = new UserService(userRepository);
+		
+		assertThrows(UserNotFoundException.class, () -> service.retrieve(userId));
+	}
+	
+	@Test
+	void retrieve_returnUser_whenUserWithSuppliedIdExist() throws UserNotFoundException {
+		int userId = 1;
+		User expectedUser = new User();
+		Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+		UserService service = new UserService(userRepository);
+		
+		User actualUser = service.retrieve(userId);
+		
+		assertSame(expectedUser, actualUser);
+	}
+	
+	@Test
+	void update() throws UserNotFoundException {
 		String email = "johndoe@example.com";
 		String password = "password"; 
 		String encodedPassword = "encoded_password";
 		UserUpdate dto = new UserUpdate();
 		dto.setEmail(email);
 		dto.setPassword(password);
-		User expectedUser = new User();
-		int userId = 1;
-		Mockito.when(userRepository.findById(userId)).thenReturn(Optional.of(expectedUser));
+		User user = new User();
 		UserService userService = new UserService(userRepository);
 		Mockito.when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
 		userService.setPasswordEncoder(passwordEncoder);
 		
-		userService.update(dto, userId);
+		userService.update(user, dto);
 		
-		Mockito.verify(userRepository).save(expectedUser);
-		assertEquals(email, expectedUser.getEmail());
-		assertEquals(encodedPassword,expectedUser.getPassword());
+		Mockito.verify(userRepository).save(user);
+		assertEquals(email, user.getEmail());
+		assertEquals(encodedPassword, user.getPassword());
 	}
 	
 	@Test
-	void delete() {
-		int userId = 1;
+	void delete() throws UserNotFoundException {
+		User user = new User();
 		UserService userService = new UserService(userRepository);
 		
-		userService.delete(userId);
+		userService.delete(user);
 		
-		Mockito.verify(userRepository).deleteById(userId);
+		Mockito.verify(userRepository).delete(user);
 	}
 }

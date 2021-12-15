@@ -28,7 +28,7 @@ import com.github.damivik.bookly.entity.User;
 @Tag("it")
 @SpringBootTest
 @AutoConfigureMockMvc
-class BookshelfControllerITest {
+class BookshelfControllerItTest {
 	@Autowired
 	private Database database;
 
@@ -54,7 +54,7 @@ class BookshelfControllerITest {
 	}
 
 	@Test
-	void retrieve() throws Exception {
+	void read() throws Exception {
 		User user = database.createUser();
 		Bookshelf bookshelf = database.createBookshelf(user);
 
@@ -62,9 +62,22 @@ class BookshelfControllerITest {
 			.perform(
 					get("/api/bookshelves/" + bookshelf.getId())
 					.with(httpBasic(user.getUsername(), "password")))
-			.andExpect(status().isOk()).andExpect(jsonPath("$.id", is(bookshelf.getId())))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id", is(bookshelf.getId())))
 			.andExpect(jsonPath("$.name", is(bookshelf.getName())))
-			.andExpect(jsonPath("$.booksCount", is(bookshelf.getBooks().size())));
+			.andExpect(jsonPath("$.bookCount", is(bookshelf.getBooks().size())));
+	}
+
+	@Test
+	void read_returnHttpNotFoundStatusCode_whenBookshelfDoesNotExist() throws Exception {
+		User user = database.createUser();
+		int nonExistentBookshelfid = 0;
+
+		mvc
+			.perform(
+					get("/api/bookshelves/" + nonExistentBookshelfid)
+					.with(httpBasic(user.getUsername(), "password")))
+			.andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -92,9 +105,41 @@ class BookshelfControllerITest {
 			.andExpect(status().isForbidden());
 	}
 
+	
+	@Test
+	void update() throws Exception {
+		User user = database.createUser();
+		Bookshelf bookshelf = database.createBookshelf(user);
+		String newName = "Non-Fiction";
+
+		mvc
+			.perform(
+					patch("/api/bookshelves/" + bookshelf.getId())
+					.param("name", newName)
+					.with(httpBasic(user.getUsername(), "password")))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id", is(bookshelf.getId())))
+			.andExpect(jsonPath("$.name", is(newName)))
+			.andExpect(jsonPath("$.bookCount", is(bookshelf.getBooks().size())));
+	}
+	
+	@Test
+	void update_whenAuthenticatedUserNotOwnerOfBookshelf_returnForbiddenStatus() throws Exception {
+		User shelfOwner = database.createUser();
+		User notShelfOwner = database.createUser("not_shelf_owner@example.com");
+		Bookshelf bookshelf = database.createBookshelf(shelfOwner);
+		String newName = "Non-Fiction";
+
+		mvc
+			.perform(
+					patch("/api/bookshelves/" + bookshelf.getId())
+					.param("name", newName)
+					.with(httpBasic(notShelfOwner.getUsername(), "password")))
+			.andExpect(status().isForbidden());
+	}
 
 	@Test
-	void index() throws Exception {
+	void retrieveUserBookshelves() throws Exception {
 		User user = database.createUser();
 		List<Bookshelf> bookshelves = database.createBookshelves(user);
 
@@ -113,35 +158,22 @@ class BookshelfControllerITest {
 	}
 
 	@Test
-	void update() throws Exception {
+	void retrieveBooks() throws Exception {
 		User user = database.createUser();
 		Bookshelf bookshelf = database.createBookshelf(user);
-		String newName = "Non-Fiction";
-
+		
 		mvc
 			.perform(
-					patch("/api/bookshelves/" + bookshelf.getId())
-					.param("name", newName)
-					.with(httpBasic(user.getUsername(), "password")))
+				get("/api/bookshelves/" + bookshelf.getId() + "/books")
+				.with(httpBasic(user.getUsername(), "password")))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id", is(bookshelf.getId())))
-			.andExpect(jsonPath("$.name", is(newName)))
-			.andExpect(jsonPath("$.booksCount", is(bookshelf.getBooks().size())));
-	}
-	
-	@Test
-	void update_whenAuthenticatedUserNotOwnerOfBookshelf_returnForbiddenStatus() throws Exception {
-		User shelfOwner = database.createUser();
-		User notShelfOwner = database.createUser("not_shelf_owner@example.com");
-		Bookshelf bookshelf = database.createBookshelf(shelfOwner);
-		String newName = "Non-Fiction";
-
-		mvc
-			.perform(
-					patch("/api/bookshelves/" + bookshelf.getId())
-					.param("name", newName)
-					.with(httpBasic(notShelfOwner.getUsername(), "password")))
-			.andExpect(status().isForbidden());
+			.andExpect(jsonPath("$.count", is(bookshelf.getBooks().size())))
+			.andExpect(jsonPath("$.books[0].id", is(bookshelf.getBooks().get(0).getId())))
+			.andExpect(jsonPath("$.books[0].authors", is(bookshelf.getBooks().get(0).getAuthors())))
+			.andExpect(jsonPath("$.books[0].title", is(bookshelf.getBooks().get(0).getTitle())))
+			.andExpect(jsonPath("$.books[1].id", is(bookshelf.getBooks().get(1).getId())))
+			.andExpect(jsonPath("$.books[1].authors", is(bookshelf.getBooks().get(1).getAuthors())))
+			.andExpect(jsonPath("$.books[1].title", is(bookshelf.getBooks().get(1).getTitle())));
 	}
 	
 	@Test
@@ -155,7 +187,7 @@ class BookshelfControllerITest {
 					post("/api/bookshelves/" + bookshelf.getId() + "/books")
 					.param("bookId", book.getId().toString())
 					.with(httpBasic(user.getUsername(), "password")))
-			.andExpect(status().isCreated());
+			.andExpect(status().isNoContent());
 	}
 	
 	@Test

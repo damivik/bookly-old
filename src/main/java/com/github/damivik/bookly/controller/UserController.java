@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.github.damivik.bookly.dto.UserRegistration;
 import com.github.damivik.bookly.dto.UserUpdate;
 import com.github.damivik.bookly.entity.User;
+import com.github.damivik.bookly.exception.UserNotFoundException;
 import com.github.damivik.bookly.service.UserService;
 
 @RestController
@@ -36,13 +38,29 @@ public class UserController {
 	
 	@PatchMapping("/api/users/{userId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void update(@Valid UserUpdate dto, @PathVariable int userId) {
-		userService.update(dto, userId);
+	public void update(@PathVariable int userId, @Valid UserUpdate dto) {
+		User user;
+		
+		try {
+			user = userService.retrieve(userId);
+		} catch (UserNotFoundException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+		
+		userService.update(user, dto);
 	}
 	
 	@DeleteMapping("/api/users/{userId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable int userId) {
-		userService.delete(userId);
+		User user;
+		
+		try {
+			user = userService.retrieve(userId);
+		} catch (UserNotFoundException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+		
+		userService.delete(user);
 	}
 }

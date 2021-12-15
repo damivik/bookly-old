@@ -22,7 +22,7 @@ import com.github.damivik.bookly.entity.Book;
 @Tag("it")
 @SpringBootTest
 @AutoConfigureMockMvc
-public class BookControllerITest {
+public class BookControllerItTest {
 	@Autowired
 	private MockMvc mvc;
 	
