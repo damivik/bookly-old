@@ -1,4 +1,4 @@
-package com.github.damivik.bookly.controller;
+package com.github.damivik.bookly.integrationtest.api;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -6,31 +6,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
 
-import com.github.damivik.bookly.Database;
 import com.github.damivik.bookly.entity.User;
+import com.github.damivik.bookly.integrationtest.BaseTest;
 
-@Tag("it")
-@SpringBootTest
-@AutoConfigureMockMvc
-public class UserControllerItTest {
-	@Autowired
-	private MockMvc mvc;
-	
-	@Autowired
-	private Database database;
-	
-	@BeforeEach
-	public void setUp() {
-		database.refresh();
-	}
+public class UserTest extends BaseTest {
 	
 	@Test
 	void create_whenRequestParametersAreValid_returnCreatedStatus() throws Exception {
@@ -49,7 +30,7 @@ public class UserControllerItTest {
 	
 	@Test
 	void update_returnNoContentStatus() throws Exception {
-		User user = database.createUser();
+		User user = databaseHelper.createUser();
 		String newEmail = "damivik@example.com";
 		String newPassword = "new_password";
 		
@@ -67,7 +48,7 @@ public class UserControllerItTest {
 	@Test
 	void update_whenUserWithSuppliedUserIdDoesNotExist_returnNotFoundStatus() throws Exception {
 		int nonExistingUserId = 0;
-		User user = database.createUser();
+		User user = databaseHelper.createUser();
 		String newEmail = "damivik@example.com";
 		String newPassword = "new_password";
 		
@@ -84,8 +65,8 @@ public class UserControllerItTest {
 	
 	@Test
 	void update_whenAuthenticatedUserNotOwnerOfAccount_returnsForbiddenStatus() throws Exception {
-		User accountOwner = database.createUser();
-		User notAccountOwner = database.createUser("not_account_owner@example.com");
+		User accountOwner = databaseHelper.createUser();
+		User notAccountOwner = databaseHelper.createUser("not_account_owner@example.com");
 		String newEmail = "new_email@example.com";
 		String newPassword = "new_password";
 		
@@ -102,7 +83,7 @@ public class UserControllerItTest {
 	
 	@Test
 	void delete_returnNoContentStatus() throws Exception {
-		User user = database.createUser();
+		User user = databaseHelper.createUser();
 		
 		mvc
 			.perform(
@@ -115,8 +96,8 @@ public class UserControllerItTest {
 	
 	@Test
 	void delete_whenAuthenticatedUserNotOwnerOfAccount_returnsForbiddenStatus() throws Exception {
-		User accountOwner = database.createUser();
-		User notAccountOwner = database.createUser("not_account_owner@example.com");
+		User accountOwner = databaseHelper.createUser();
+		User notAccountOwner = databaseHelper.createUser("not_account_owner@example.com");
 		
 		mvc
 			.perform(
@@ -130,7 +111,7 @@ public class UserControllerItTest {
 	@Test
 	void delete_whenUserWithSuppliedUserIdDoesNotExist_returnNotFoundStatus() throws Exception {
 		int nonExistingUserId = 0;
-		User user = database.createUser();
+		User user = databaseHelper.createUser();
 		
 		mvc
 			.perform(

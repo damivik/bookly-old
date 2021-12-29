@@ -1,4 +1,4 @@
-package com.github.damivik.bookly.controller;
+package com.github.damivik.bookly.integrationtest.api;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -11,38 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.github.damivik.bookly.Database;
 import com.github.damivik.bookly.entity.Book;
 import com.github.damivik.bookly.entity.Bookshelf;
 import com.github.damivik.bookly.entity.User;
+import com.github.damivik.bookly.integrationtest.BaseTest;
 
-@Tag("it")
-@SpringBootTest
-@AutoConfigureMockMvc
-class BookshelfControllerItTest {
-	@Autowired
-	private Database database;
-
-	@Autowired
-	private MockMvc mvc;
-
-	@BeforeEach
-	public void setUp() {
-		database.refresh();
-	}
-
+class BookshelfTest extends BaseTest {
 	@Test
 	void create() throws Exception {
-		User user = database.createUser();
+		User user = databaseHelper.createUser();
 		String bookshelfName = "Mystery/Thrillers";
 
 		mvc
@@ -55,8 +35,8 @@ class BookshelfControllerItTest {
 
 	@Test
 	void read() throws Exception {
-		User user = database.createUser();
-		Bookshelf bookshelf = database.createBookshelf(user);
+		User user = databaseHelper.createUser();
+		Bookshelf bookshelf = databaseHelper.createBookshelf(user);
 
 		mvc
 			.perform(
@@ -70,7 +50,7 @@ class BookshelfControllerItTest {
 
 	@Test
 	void read_returnHttpNotFoundStatusCode_whenBookshelfDoesNotExist() throws Exception {
-		User user = database.createUser();
+		User user = databaseHelper.createUser();
 		int nonExistentBookshelfid = 0;
 
 		mvc
@@ -82,8 +62,8 @@ class BookshelfControllerItTest {
 
 	@Test
 	void delete() throws Exception {
-		User user = database.createUser();
-		Bookshelf bookshelf = database.createBookshelf(user);
+		User user = databaseHelper.createUser();
+		Bookshelf bookshelf = databaseHelper.createBookshelf(user);
 
 		mvc
 			.perform(MockMvcRequestBuilders
@@ -94,9 +74,9 @@ class BookshelfControllerItTest {
 	
 	@Test
 	void delete_whenAuthenticatedUserNotOwnerOfBookshelf_returnsForbiddenStatus() throws Exception {
-		User shelfOwner = database.createUser();
-		User notShelfOwner = database.createUser("not_shelf_owner@example.com");
-		Bookshelf bookshelf = database.createBookshelf(shelfOwner);
+		User shelfOwner = databaseHelper.createUser();
+		User notShelfOwner = databaseHelper.createUser("not_shelf_owner@example.com");
+		Bookshelf bookshelf = databaseHelper.createBookshelf(shelfOwner);
 
 		mvc
 			.perform(MockMvcRequestBuilders
@@ -108,8 +88,8 @@ class BookshelfControllerItTest {
 	
 	@Test
 	void update() throws Exception {
-		User user = database.createUser();
-		Bookshelf bookshelf = database.createBookshelf(user);
+		User user = databaseHelper.createUser();
+		Bookshelf bookshelf = databaseHelper.createBookshelf(user);
 		String newName = "Non-Fiction";
 
 		mvc
@@ -125,9 +105,9 @@ class BookshelfControllerItTest {
 	
 	@Test
 	void update_whenAuthenticatedUserNotOwnerOfBookshelf_returnForbiddenStatus() throws Exception {
-		User shelfOwner = database.createUser();
-		User notShelfOwner = database.createUser("not_shelf_owner@example.com");
-		Bookshelf bookshelf = database.createBookshelf(shelfOwner);
+		User shelfOwner = databaseHelper.createUser();
+		User notShelfOwner = databaseHelper.createUser("not_shelf_owner@example.com");
+		Bookshelf bookshelf = databaseHelper.createBookshelf(shelfOwner);
 		String newName = "Non-Fiction";
 
 		mvc
@@ -140,8 +120,8 @@ class BookshelfControllerItTest {
 
 	@Test
 	void retrieveUserBookshelves() throws Exception {
-		User user = database.createUser();
-		List<Bookshelf> bookshelves = database.createBookshelves(user);
+		User user = databaseHelper.createUser();
+		List<Bookshelf> bookshelves = databaseHelper.createBookshelves(user);
 
 		mvc
 			.perform(
@@ -159,8 +139,8 @@ class BookshelfControllerItTest {
 
 	@Test
 	void retrieveBooks() throws Exception {
-		User user = database.createUser();
-		Bookshelf bookshelf = database.createBookshelf(user);
+		User user = databaseHelper.createUser();
+		Bookshelf bookshelf = databaseHelper.createBookshelf(user);
 		
 		mvc
 			.perform(
@@ -178,9 +158,9 @@ class BookshelfControllerItTest {
 	
 	@Test
 	void addBook() throws Exception {
-		User user = database.createUser();
-		Bookshelf bookshelf = database.createBookshelf(user);
-		Book book = database.createBook();
+		User user = databaseHelper.createUser();
+		Bookshelf bookshelf = databaseHelper.createBookshelf(user);
+		Book book = databaseHelper.createBook();
 
 		mvc
 			.perform(
@@ -192,10 +172,10 @@ class BookshelfControllerItTest {
 	
 	@Test
 	void addBook_whenAuthenticatedUserNotOwnerOfBookshelf_returnForbiddenStatus() throws Exception {
-		User shelfOwner = database.createUser();
-		User notShelfOwner = database.createUser("not_shelf_owner@example.com");
-		Bookshelf bookshelf = database.createBookshelf(shelfOwner);
-		Book book = database.createBook();
+		User shelfOwner = databaseHelper.createUser();
+		User notShelfOwner = databaseHelper.createUser("not_shelf_owner@example.com");
+		Bookshelf bookshelf = databaseHelper.createBookshelf(shelfOwner);
+		Book book = databaseHelper.createBook();
 
 		mvc
 			.perform(
@@ -208,8 +188,8 @@ class BookshelfControllerItTest {
 
 	@Test
 	void removeBook() throws Exception {
-		User user = database.createUser();
-		Bookshelf bookshelf = database.createBookshelf(user);
+		User user = databaseHelper.createUser();
+		Bookshelf bookshelf = databaseHelper.createBookshelf(user);
 
 		mvc
 			.perform(
@@ -221,9 +201,9 @@ class BookshelfControllerItTest {
 	
 	@Test
 	void removeBook_whenAuthenticatedUserNotOwnerOfBookshelf_returnForbiddenStatus() throws Exception {
-		User shelfOwner = database.createUser();
-		User notShelfOwner = database.createUser("not_shelf_owner@example.com");
-		Bookshelf bookshelf = database.createBookshelf(shelfOwner);
+		User shelfOwner = databaseHelper.createUser();
+		User notShelfOwner = databaseHelper.createUser("not_shelf_owner@example.com");
+		Bookshelf bookshelf = databaseHelper.createBookshelf(shelfOwner);
 
 		mvc.perform(
 				MockMvcRequestBuilders

@@ -1,4 +1,4 @@
-package com.github.damivik.bookly;
+package com.github.damivik.bookly.integrationtest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,7 +16,7 @@ import com.github.damivik.bookly.repository.BookshelfRepository;
 import com.github.damivik.bookly.repository.UserRepository;
 
 @Component
-public class Database {
+public class DatabaseHelper {
 	@Autowired
 	private UserRepository userRepository;
 

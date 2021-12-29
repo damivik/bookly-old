@@ -1,4 +1,4 @@
-package com.github.damivik.bookly.controller;
+package com.github.damivik.bookly.integrationtest.api;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -7,40 +7,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.ArrayList;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 
-import com.github.damivik.bookly.Database;
 import com.github.damivik.bookly.entity.Book;
+import com.github.damivik.bookly.integrationtest.BaseTest;
 
-@Tag("it")
-@SpringBootTest
-@AutoConfigureMockMvc
-public class BookControllerItTest {
-	@Autowired
-	private MockMvc mvc;
-	
-	@Autowired
-	private Database database;
-	
-	@BeforeEach
-	public void setUp() {
-		database.refresh();
-	}
+public class BookTest extends BaseTest {
 	
 	@Test
 	@WithMockUser
 	void searchBooksByTitle() throws Exception {
 		ArrayList<Book> books = new ArrayList<>();
-		books.add(database.createBook("Harry Potter and the Philosopher''s Stone", "J. K. Rowling"));
-		books.add(database.createBook("Harry Potter and the Chamber of Secrets", "J. K. Rowling"));
-		books.add(database.createBook("To kill a Mockingbird", "Harper Lee"));
+		books.add(databaseHelper.createBook("Harry Potter and the Philosopher''s Stone", "J. K. Rowling"));
+		books.add(databaseHelper.createBook("Harry Potter and the Chamber of Secrets", "J. K. Rowling"));
+		books.add(databaseHelper.createBook("To kill a Mockingbird", "Harper Lee"));
 		String q = "Harry Potter";
 		
 		mvc
@@ -58,7 +39,7 @@ public class BookControllerItTest {
 	@Test
 	@WithMockUser
 	void retriveBook() throws Exception {
-		Book book = database.createBook("To kill a Mockingbird", "Harper Lee");
+		Book book = databaseHelper.createBook("To kill a Mockingbird", "Harper Lee");
 		
 		mvc
 			.perform(get("/api/books/" + book.getId()))
