@@ -23,7 +23,7 @@ public class SecurityConfiguration {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			http
-				.antMatcher("/**")
+				.antMatcher("/api/**")
 				.authorizeRequests()
 				.antMatchers(HttpMethod.POST, "/api/users")
 				.permitAll()
