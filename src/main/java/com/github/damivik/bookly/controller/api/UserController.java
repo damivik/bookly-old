@@ -1,4 +1,4 @@
-package com.github.damivik.bookly.controller;
+package com.github.damivik.bookly.controller.api;
 
 import java.net.URI;
 
