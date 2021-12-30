@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.github.damivik.bookly.dto.UserRegistration;
+import com.github.damivik.bookly.dto.SignupDto;
 import com.github.damivik.bookly.dto.UserUpdate;
 import com.github.damivik.bookly.entity.User;
 import com.github.damivik.bookly.exception.UserNotFoundException;
@@ -30,7 +30,7 @@ class UserControllerTest {
 		User expectedUser = new User();
 		int userId = 1;
 		expectedUser.setId(userId);
-		UserRegistration dto = new UserRegistration(email, password);
+		SignupDto dto = new SignupDto(email, password);
 		Mockito.when(userService.register(dto)).thenReturn(expectedUser);
 		UserController controller = new UserController(userService);
 		String expectedLocation = "/users/" + userId;

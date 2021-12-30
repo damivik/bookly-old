@@ -6,7 +6,7 @@ import javax.validation.constraints.Size;
 
 import com.github.damivik.bookly.validation.UniqueEmail;
 
-public class UserRegistration {
+public class SignupDto {
 	@NotBlank
 	@Size(max = 255)
 	@Email
@@ -17,7 +17,7 @@ public class UserRegistration {
 	@Size(min = 8, max = 30)
 	private String password;
 	
-	public UserRegistration(String email, String password) {
+	public SignupDto(String email, String password) {
 		this.email = email;
 		this.password = password;
 	}

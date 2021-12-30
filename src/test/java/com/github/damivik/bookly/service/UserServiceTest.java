@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.github.damivik.bookly.dto.UserRegistration;
+import com.github.damivik.bookly.dto.SignupDto;
 import com.github.damivik.bookly.dto.UserUpdate;
 import com.github.damivik.bookly.entity.User;
 import com.github.damivik.bookly.exception.UserNotFoundException;
@@ -31,7 +31,7 @@ class UserServiceTest {
 	void register() {
 		String email = "johndoe@example.com";
 		String password = "password";
- 		UserRegistration dto = new UserRegistration(email, password);
+ 		SignupDto dto = new SignupDto(email, password);
 		User expectedUser = new User();
 		Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(expectedUser);
 		UserService service = new UserService(userRepository);
