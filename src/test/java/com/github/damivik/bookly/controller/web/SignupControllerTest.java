@@ -1,5 +1,6 @@
 package com.github.damivik.bookly.controller.web;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -42,7 +43,8 @@ class SignupControllerTest {
 			.perform(
 					post("/signup")
 					.param("email", "dami@mail.com")
-					.param("password","password"))
+					.param("password", "password")
+					.with(csrf()))
 			.andExpect(redirectedUrl("/login"));
 	}
 }
