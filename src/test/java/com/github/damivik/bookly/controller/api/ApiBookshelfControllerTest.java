@@ -27,7 +27,7 @@ import com.github.damivik.bookly.service.BookshelfService;
 import com.github.damivik.bookly.service.UserService;
 
 @MockitoSettings(strictness = Strictness.STRICT_STUBS)
-class BookshelfControllerTest {
+class ApiBookshelfControllerTest {
 
 	@Mock
 	private BookshelfService bookshelfService;
@@ -50,7 +50,7 @@ class BookshelfControllerTest {
 		bookshelf.setId(bookshelfId);
 		Mockito.when(authentication.getPrincipal()).thenReturn(user);
 		Mockito.when(bookshelfService.create(user, name)).thenReturn(bookshelf);
-		BookshelfController controller = new BookshelfController(bookshelfService);
+		ApiBookshelfController controller = new ApiBookshelfController(bookshelfService);
 		String expectedLocation = "/bookshelves/" + bookshelfId;
 
 		ResponseEntity<String> responseEntity = controller.create(authentication, name);
@@ -64,7 +64,7 @@ class BookshelfControllerTest {
 			throws BookshelfNotFoundException {
 		int bookshelfId = 1;
 		Mockito.when(bookshelfService.retrieveBookshelf(bookshelfId)).thenThrow(BookshelfNotFoundException.class);
-		BookshelfController controller = new BookshelfController(bookshelfService);
+		ApiBookshelfController controller = new ApiBookshelfController(bookshelfService);
 
 		ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> controller.read(bookshelfId));
 		assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
@@ -80,7 +80,7 @@ class BookshelfControllerTest {
 		bookshelf.setName(name);
 		bookshelf.setBooks(books);
 		Mockito.when(bookshelfService.retrieveBookshelf(bookshelfId)).thenReturn(bookshelf);
-		BookshelfController controller = new BookshelfController(bookshelfService);
+		ApiBookshelfController controller = new ApiBookshelfController(bookshelfService);
 
 		BookshelfView dto = controller.read(bookshelfId);
 		
@@ -94,7 +94,7 @@ class BookshelfControllerTest {
 		int bookshelfId = 1;
 		Bookshelf bookshelf = new Bookshelf();
 		Mockito.when(bookshelfService.retrieveBookshelf(bookshelfId)).thenReturn(bookshelf);
-		BookshelfController controller = new BookshelfController(bookshelfService);
+		ApiBookshelfController controller = new ApiBookshelfController(bookshelfService);
 		
 		controller.delete(bookshelfId);
 		
@@ -112,7 +112,7 @@ class BookshelfControllerTest {
 		bookshelf.setBooks(books);
 		Mockito.when(bookshelfService.retrieveBookshelf(bookshelfId)).thenReturn(bookshelf);
 		Mockito.when(bookshelfService.updateBookshelf(bookshelf, name)).thenReturn(bookshelf);
-		BookshelfController controller = new BookshelfController(bookshelfService);
+		ApiBookshelfController controller = new ApiBookshelfController(bookshelfService);
 
 		BookshelfView dto = controller.update(bookshelfId, name);
 		
@@ -128,7 +128,7 @@ class BookshelfControllerTest {
 		List<Bookshelf> bookshelves = getBookshelves();
 		Mockito.when(bookshelfService.retrieveUserBookshelves(user)).thenReturn(bookshelves);
 		Mockito.when(userService.retrieve(userId)).thenReturn(user);
-		BookshelfController controller = new BookshelfController(bookshelfService);
+		ApiBookshelfController controller = new ApiBookshelfController(bookshelfService);
 		controller.setUserService(userService);
 		
 		BookshelfListView dto = controller.retrieveUserBookshelves(userId);
@@ -148,7 +148,7 @@ class BookshelfControllerTest {
 		Bookshelf bookshelf = new Bookshelf();
 		bookshelf.setBooks(getBooks());
 		Mockito.when(bookshelfService.retrieveBookshelf(bookshelfId)).thenReturn(bookshelf);
-		BookshelfController controller = new BookshelfController(bookshelfService);
+		ApiBookshelfController controller = new ApiBookshelfController(bookshelfService);
 		
 		BookListView dto = controller.retrieveBooks(bookshelfId);
 		
@@ -164,7 +164,7 @@ class BookshelfControllerTest {
 		Book book = new Book();
 		Mockito.when(bookshelfService.retrieveBookshelf(bookshelfId)).thenReturn(bookshelf);
 		Mockito.when(bookService.retrieve(bookId)).thenReturn(book);
-		BookshelfController controller = new BookshelfController(bookshelfService);
+		ApiBookshelfController controller = new ApiBookshelfController(bookshelfService);
 		controller.setBookService(bookService);
 		
 		controller.addBook(bookshelfId, bookId);
@@ -180,7 +180,7 @@ class BookshelfControllerTest {
 		Book book = new Book();
 		Mockito.when(bookshelfService.retrieveBookshelf(bookshelfId)).thenReturn(bookshelf);
 		Mockito.when(bookService.retrieve(bookId)).thenReturn(book);
-		BookshelfController controller = new BookshelfController(bookshelfService);
+		ApiBookshelfController controller = new ApiBookshelfController(bookshelfService);
 		controller.setBookService(bookService);
 		
 		controller.removeBook(bookshelfId, bookId);

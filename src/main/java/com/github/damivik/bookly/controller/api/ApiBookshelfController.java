@@ -37,12 +37,12 @@ import com.github.damivik.bookly.service.UserService;
 import com.github.damivik.bookly.validation.UserExists;
 
 @RestController
-public class BookshelfController {
+public class ApiBookshelfController {
 	private BookshelfService bookshelfService;
 	private UserService userService;
 	private BookService bookService;
 
-	public BookshelfController(BookshelfService bookshelfService) {
+	public ApiBookshelfController(BookshelfService bookshelfService) {
 		this.bookshelfService = bookshelfService;
 	}
 

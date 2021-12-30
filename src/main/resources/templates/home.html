@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" th:replace="~{fragments/layout :: layout(~{::title}, ~{::header}, ~{::main})}">
+
+<head>
+	<title>Bookly</title>
+</head>
+
+<body>
+	<header th:replace="fragments/header :: header"></header>
+
+	<main class="container">
+		<div>
+			<h1>Bookshelves</h1>
+		</div>
+		<hr>
+
+		<button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#createShelfForm">
+			Add shelf
+		</button>
+
+		<!-- Modal start -->
+		<form th:action="@{/addShelf}" method="POST" class="mt-3 collapse" id="createShelfForm">
+			<div class="row g-2">
+				<div class="col-md">
+					<div class="form-floating mb-3">
+						<input type="text" class="form-control" id="name" name="name" maxlength="255" required>
+						<label for="name">Name</label>
+					</div>
+				</div>
+				<div class="col-md">
+					<button class="btn btn-lg btn-primary" type="submit">Add</button>
+				</div>
+			</div>
+		</form>
+		<!-- Modal end -->
+
+		<!--  Bookshelves list start -->
+		<div class="list-group list-group-flush mt-3">
+			<a th:href="@{'/mybooks' + '/' + ${bookshelf.id}}" class="list-group-item"
+				th:each="bookshelf : ${bookshelves}">
+				<span th:text="${bookshelf.name}"></span>
+				<span class="badge bg-primary rounded-pill" th:text="${bookshelf.getBooks.size}"></span>
+			</a>
+		</div>
+		<!--  Bookshelves list end -->
+		
+	</main>
+
+</body>
+
+</html>

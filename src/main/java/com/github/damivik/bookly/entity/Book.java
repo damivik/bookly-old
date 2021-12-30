@@ -1,10 +1,13 @@
 package com.github.damivik.bookly.entity;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 
 @Entity
 public class Book {
@@ -17,6 +20,11 @@ public class Book {
 
 	@Column(nullable = false)
 	private String authors;
+	
+	private String cover;
+	
+	@ManyToMany(mappedBy = "books")
+	private List<Bookshelf> bookshelves;
 
 	public Book() {
 	}
@@ -48,6 +56,23 @@ public class Book {
 
 	public void setAuthors(String authors) {
 		this.authors = authors;
+	}
+
+	
+	public List<Bookshelf> getBookshelves() {
+		return bookshelves;
+	}
+
+	public void setBookshelves(List<Bookshelf> bookshelves) {
+		this.bookshelves = bookshelves;
+	}
+
+	public String getCover() {
+		return cover;
+	}
+
+	public void setCover(String cover) {
+		this.cover = cover;
 	}
 
 	@Override

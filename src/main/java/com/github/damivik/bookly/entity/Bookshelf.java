@@ -7,8 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 @Entity
 public class Bookshelf {
@@ -22,7 +22,7 @@ public class Bookshelf {
 	@Column(nullable = false)
 	private String name;
 	
-	@OneToMany
+	@ManyToMany
 	private List<Book> books;
 	
 	public Bookshelf() {
@@ -66,10 +66,12 @@ public class Bookshelf {
 	}
 	
 	public void addBook(Book book) {
-		this.books.add(book);
+		books.add(book);
+		book.getBookshelves().add(this);
 	}
 	
 	public void removeBook(Book book) {
-		this.books.remove(book);
+		books.remove(book);
+		book.getBookshelves().remove(this);
 	}
 }
